@@ -62,10 +62,10 @@ int main(void)
 	puts(" Winsock Initialized");
 
 	ZeroMemory(&hints, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_flags = AI_PASSIVE;
+	hints.ai_family = AF_INET; // IPv4
+	hints.ai_socktype = SOCK_STREAM; // Connection oriented TCP protocol
+	hints.ai_protocol = IPPROTO_TCP; //TCP protocol
+	hints.ai_flags = AI_PASSIVE; //For INADDR_ANY 
 
 	// Resolve the server address and port
 	iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
@@ -110,8 +110,6 @@ int main(void)
 		return 1;
 	}
 
-	
-
 	puts(" Listening for a connection...");
 
 	// Accept a client socket
@@ -126,6 +124,7 @@ int main(void)
 
 		puts("\n Client accepted: ");
 
+		//Print client's socket
 		int len = sizeof(struct sockaddr);
 		struct sockaddr_in sockAddr;
 		getsockname(ClientSocket, (struct sockaddr *) &sockAddr, &len);
@@ -142,14 +141,21 @@ int main(void)
 			if (iResult > 0) {
 				recvbuf[iResult-1] = '\0';
 				puts(recvbuf);
-
-				char *message = " I recieved your message client!\n";
-				send(ClientSocket, message, recvbuflen, 0);
+				char * foundCard;
+				foundCard = strstr(recvbuf, "Card");
+				if (foundCard != NULL)
+				{
+					char *message = " You sent a card\n";
+					send(ClientSocket, message, recvbuflen, 0);
+				}
+				else
+				{
+					char *message = " I recieved your message client!\n";
+					send(ClientSocket, message, recvbuflen, 0);
+				}
 			}
 			else if (iResult == 0)
 				puts(" Client lost connection");
-			else
-				puts(" WSA ERROR" + WSAGetLastError());
 
 		} while (iResult > 0);
 
@@ -218,7 +224,7 @@ int main(void)
 		puts(" Listening for a connection...");
 	}
 
-	// cleanup
+	// Cleanup
 	closesocket(ClientSocket);
 	WSACleanup();
 

@@ -81,9 +81,10 @@ int main() {
 
 	// Address Info
 	SOCKADDR_IN addr;
-	addr.sin_addr.s_addr = inet_addr("192.168.1.135");
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(8888);
+	//addr.sin_addr.s_addr = inet_addr("192.168.1.135"); //Server IP
+	addr.sin_addr.s_addr = inet_addr("127.0.0.1"); //localhost IP
+	addr.sin_family = AF_INET; //IPv4
+	addr.sin_port = htons(8888); //Port
 
 	//Connect to Spades Server
 	if (connect(ServerSocket, (struct sockaddr *)&addr, sizeof(addr)) < 0)
@@ -97,21 +98,27 @@ int main() {
 	cout << "\n Press Enter to Continue: ";
 	getline(cin, str);
 
+	//Start sending/recieving messages
 	sendMessage(" I connected to you server!\n");
 	recieveMessage();
 	cout << "\n Press Enter to Continue: ";
 	getline(cin, str);
 	sendMessage(" I would like to set up a game!\n");
 	recieveMessage();
-	sendMessage("Card 22\n");
+	cout << "\n Press Enter to Continue: ";
+	getline(cin, str);
+	sendMessage(" Card 22\n");
 	recieveMessage();
 
 	puts("\n Done sending messages");
 	cout << "\n Press Enter to Exit: ";
 	getline(cin, str);
 
+	return 0;
+
 } // end main
 
+//Send a message to server
 int sendMessage(char* message)
 {
 	int sent = send(ServerSocket, message, recvbuflen, 0);
@@ -120,6 +127,7 @@ int sendMessage(char* message)
 	return sent;
 } // end sendMessage
 
+//Recieve response from server
 int recieveMessage()
 {
 	int recieved = recv(ServerSocket, recvbuf, recvbuflen, 0);
@@ -130,6 +138,6 @@ int recieveMessage()
 	else if (recieved == 0)
 		puts(" Server lost connection");
 	else
-		puts("WSA ERROR" + WSAGetLastError());
+		printf("WSA ERROR: %d\n", WSAGetLastError());
 	return recieved;
 } // end recieveMessage
