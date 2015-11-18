@@ -2,11 +2,11 @@
 File       : Server.cpp
 Program    : CSC 311 Project
 Due Date   : November 2015
-Author     : Justin Kirk,
-Richard McIlwain,
-Jesse Bryant,
-Arlando Boykin,
-Alan Bodiford
+Authors    : Justin Kirk,
+			 Richard McIlwain,
+			 Jesse Bryant,
+			 Arlando Boykin,
+			 Alan Bodiford
 Description: Code for CSC 311 Spades Project
 			 Server
 */
@@ -44,7 +44,9 @@ int main(void)
 	std::cout << "*****************************************************************" << std::endl
 		<< "*                         Spades Server                         *" << std::endl
 		<< "*****************************************************************" << std::endl
-		<< "* Richard McIlwain, Jesse Bryant, Arlando Boykin, Alan Bodiford *" << std::endl
+		<< "*          Justin Kirk, Richard McIlwain, Jesse Bryant          *" << std::endl
+		<< "*****************************************************************" << std::endl
+		<< "*               Arlando Boykin, Alan Bodiford                   *" << std::endl
 		<< "*****************************************************************" << std::endl
 		<< "*                    CSC 311 Spades Project                     *" << std::endl
 		<< "*****************************************************************" << std::endl
