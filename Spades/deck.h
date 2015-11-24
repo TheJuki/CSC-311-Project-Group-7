@@ -1,35 +1,43 @@
 #ifndef DECK_H
 #define DECK_H
 
-#include "Card.h"
+using namespace std;
 
+#include "Card.h"
 #include <algorithm>
 
 
-class Deck{
+class Deck {
 private:
-	
-	
+	std::vector <Card*> deck;
+	std::vector <Card*> table;
+
 public:
-	std::vector <Card> deck;
-	static std::vector <Card> table;
-	
-	Deck(){
-	for(int suit = (Card::Suit)0; suit <= (Card::Suit)4; suit++){
-		//begin inner loop for cardinal value 
-		for(int rank = (Card::Rank)0; rank <= (Card::Suit)13; rank++){
-			//omit/skip 2 of diamonds and 2 of hearts
-			if((rank == Card::TWO) && ((suit == Card::DIAMONDS) || (suit == Card::HEARTS)))
-				continue;
-			//add cards of current suit and rank from enum to deck
-			deck.push_back(Card((Card::Suit)suit, (Card::Rank)rank));
+
+	Deck() {
+		for (int suit = 0; suit <= 4; suit++) {
+			//begin inner loop for cardinal value
+			for (int rank = 0; rank <= 13; rank++) {
+				//omit/skip 2 of diamonds and 2 of hearts
+				if ((rank == (int)Rank::TWO) && ((suit == (int)Suit::DIAMONDS) || (suit == (int)Suit::HEARTS)))
+					continue;
+				else
+				{
+					Card * myCard = new Card((Suit)suit, (Rank)rank);
+					deck.push_back(myCard);
+				}
+
+			}
 		}
+		//add big and little Jokers
+		Card * lilJoker = new Card(Suit::SPADES, Rank::LJ);
+		deck.push_back(lilJoker);
+		Card * bigJoker = new Card(Suit::SPADES, Rank::BJ);
+		deck.push_back(bigJoker);
 	}
-	//add big and little Jokers
-	deck.push_back(Card(Card::SPADES, Card::LJ));
-	deck.push_back(Card(Card::SPADES, Card::BJ));
-	}	
-	
+	std::vector <Card*> getTable() { return table; }
+	std::vector <Card*> getDeck() { return deck; }
+
 	void randomDeal();
 	void drawDeal();
 

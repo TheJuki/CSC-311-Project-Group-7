@@ -1,3 +1,10 @@
 #include "Card.h"
 
-using namespace st
+bool Card::matchSuit(Suit suit)
+{
+	return true;
+}
+bool Card::checkPlay(Suit suit, Rank rank)
+{
+	return true;
+}

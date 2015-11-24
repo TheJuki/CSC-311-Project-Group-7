@@ -1,19 +1,28 @@
+#pragma once
 #ifndef HAND_H
 #define HAND_H
 
 #include "deck.h"
+#include "rank.h"
+#include "suit.h"
 
-class Player{
+class Player {
 private:
 	int books;
+	Deck deck;
+	std::vector <Card *> hand;
 public:
-	static std::vector <Card> hand;
+	Player()
+	{
+		deck = Deck();
+	}
 	int getBookNum() { return books; }
 
-void sortHand();
-Card makePlay(Card::Suit suit, Card::Rank rank);
-bool checkPlay(Player currentPlayer, Card playedCard);
+	void sortHand();
+	Card * makePlay(Suit suit, Rank rank);
+	bool checkPlay(Card * playedCard);
+	void randomDeal();
 
-}
+};
 
 #endif

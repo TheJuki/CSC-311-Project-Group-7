@@ -1,8 +1,11 @@
+#pragma once
 #ifndef CARD_H
 #define CARD_H
 
 #include <iostream>
 #include <vector>
+#include "rank.h"
+#include "suit.h"
 
 class Card
 {
@@ -10,22 +13,22 @@ private:
 	Rank rank;
 	Suit suit;
 public:
-	enum Rank{TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K, A, LJ, BJ};
-	enum Suit{DIAMONDS, CLUBS, HEARTS, SPADES};
 
-	Card();
-	Card(Suit cardSuit, Rank cardRank){
-	suit = cardSuit;
-	rank = cardRank;
-	};
-	
+
+	Card() {}
+	Card(Suit cardSuit, Rank cardRank) {
+		suit = cardSuit;
+		rank = cardRank;
+	}
+	~Card() {}
+
 	//accessor functions
-	Rank getRank()	{ return rank; }
-	Suit getSuit()	{ return suit; }
-	
+	Rank getRank() { return rank; }
+	Suit getSuit() { return suit; }
+
 	//class functions
 	bool matchSuit(Suit suit);
 	bool checkPlay(Suit suit, Rank rank);
 
-}
+};
 #endif

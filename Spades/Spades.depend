@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1448327829 source:c:\users\theju\documents\github\csc-311-project-group-7\spades\card.cpp
+	"Card.h"
+
+1448328304 c:\users\theju\documents\github\csc-311-project-group-7\spades\card.h
+	<iostream>
+	<vector>
+	"RankSuit.h"
+
+1448329652 c:\users\theju\documents\github\csc-311-project-group-7\spades\ranksuit.h
+
