@@ -15,9 +15,9 @@ private:
 public:
 
 	Deck() {
-		for (int suit = 0; suit <= 4; suit++) {
+		for (int suit = 0; suit <= 3; suit++) {
 			//begin inner loop for cardinal value
-			for (int rank = 0; rank <= 13; rank++) {
+			for (int rank = 0; rank <= 12; rank++) {
 				//omit/skip 2 of diamonds and 2 of hearts
 				if ((rank == (int)Rank::TWO) && ((suit == (int)Suit::DIAMONDS) || (suit == (int)Suit::HEARTS)))
 					continue;

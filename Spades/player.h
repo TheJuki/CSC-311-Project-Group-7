@@ -19,6 +19,7 @@ public:
 	Card * makePlay(Suit suit, Rank rank, std::vector <Card*> table);
 	bool checkPlay(Card * playedCard, std::vector <Card*> table);
 	void randomDeal(std::vector <Card*> deck);
+	void displayHand();
 
 };
 

@@ -30,5 +30,6 @@ public:
 	bool matchSuit(Suit suit);
 	bool checkPlay(Suit suit, Rank rank);
 
+	std::string displayCard();
 };
 #endif

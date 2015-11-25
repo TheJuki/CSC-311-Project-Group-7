@@ -56,13 +56,22 @@ bool Player::checkPlay(Card * playedCard, std::vector <Card*> table) {
 
 void Player::randomDeal(std::vector <Card*> deck) {
 
-	hand.reserve(13);
-
 	random_shuffle(deck.begin(), deck.end());
 
-	while (hand.back() != NULL)
+	for (int i = 0; i < 13; ++i)
 	{
 		Player::hand.push_back(deck.at(deck.size() - 1));
 		deck.pop_back();
+	}
+}
+
+void Player::displayHand() {
+
+	for (int i = 0; i < (int)hand.size(); ++i)
+	{
+		string cardString = hand[i]->displayCard();
+		cout << cardString.c_str();
+		cout << " ";
+		
 	}
 }
