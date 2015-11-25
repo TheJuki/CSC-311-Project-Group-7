@@ -1,5 +1,7 @@
 #include "player.h"
 
+using namespace std;
+
 void Player::sortHand()
 {
 	std::sort(hand.begin(), hand.end(), [](Card * card1, Card * card2)
@@ -7,7 +9,7 @@ void Player::sortHand()
 	);
 }
 
-Card * Player::makePlay(Suit playedSuit, Rank playedRank) {
+Card * Player::makePlay(Suit playedSuit, Rank playedRank, std::vector <Card*> table) {
 
 	Card * playedCard = new Card(playedSuit, playedRank);
 	std::vector<Card *>::iterator cardIt;
@@ -18,25 +20,24 @@ Card * Player::makePlay(Suit playedSuit, Rank playedRank) {
 	}
 	else {
 
-		deck.getTable().push_back(playedCard);
+		table.push_back(playedCard);
 
 		hand.erase(cardIt);
 		hand.shrink_to_fit();
 
-		checkPlay(playedCard);
+		checkPlay(playedCard, table);
 
 		return playedCard;
 	}
 	return playedCard;
 }
 
-bool Player::checkPlay(Card * playedCard) {
+bool Player::checkPlay(Card * playedCard, std::vector <Card*> table) {
 
-	Card * leadCard = deck.getTable().front();
+	Card * leadCard = table.front();
 	std::vector<Card *>::iterator cardIt;
 	bool renege = ((playedCard->getSuit() != leadCard->getSuit()) &&
 		(find(hand.begin(), hand.end(), playedCard) != hand.end()));
-	int playerBooks = this->getBookNum();
 	//check to see if card is thrown off
 	if ((leadCard->getSuit() != playedCard->getSuit()) && (playedCard->getSuit() != Suit::SPADES))
 		return leadCard->getSuit() < playedCard->getSuit();
@@ -45,23 +46,23 @@ bool Player::checkPlay(Card * playedCard) {
 	if (playedCard->getSuit() == Suit::SPADES)
 		return playedCard->getSuit() < leadCard->getSuit();
 
-	//check to see if renege (totally didnt copy this from stackoverflow)
+	//check to see if renege
 	if (renege) {
-		playerBooks = playerBooks - 2;
+		books = books - 2;
 	}
 	return false;
 
 }
 
-void Player::randomDeal() {
+void Player::randomDeal(std::vector <Card*> deck) {
 
 	hand.reserve(13);
 
-	random_shuffle(deck.getDeck().begin(), deck.getDeck().end());
+	random_shuffle(deck.begin(), deck.end());
 
 	while (hand.back() != NULL)
 	{
-		Player::hand.push_back(deck.getDeck().at(deck.getDeck().size() - 1));
-		deck.getDeck().pop_back();
+		Player::hand.push_back(deck.at(deck.size() - 1));
+		deck.pop_back();
 	}
 }

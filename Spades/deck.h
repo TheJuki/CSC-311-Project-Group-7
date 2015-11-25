@@ -38,9 +38,6 @@ public:
 	std::vector <Card*> getTable() { return table; }
 	std::vector <Card*> getDeck() { return deck; }
 
-	void randomDeal();
-	void drawDeal();
-
 };
 
 #endif

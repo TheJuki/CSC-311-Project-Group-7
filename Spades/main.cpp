@@ -8,5 +8,6 @@ int main()
     cout << "Spades Game loaded!" << endl;
 	string str;
 	getline(cin, str);
+	
     return 0;
 }
