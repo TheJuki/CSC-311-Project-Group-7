@@ -71,7 +71,6 @@ void Player::displayHand() {
 	{
 		string cardString = hand[i]->displayCard();
 		cout << cardString.c_str();
-		cout << " ";
 		
 	}
 }

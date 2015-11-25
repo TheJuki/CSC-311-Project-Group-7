@@ -19,7 +19,6 @@ std::string Card::displayCard()
 		case Suit::CLUBS: cardString = "C"; break;
 		case Suit::HEARTS: cardString = "H"; break;
 		case Suit::SPADES: cardString = "S"; break;
-		default:  cardString = "fail - ";
 	}
 	switch (rank)
 	{
@@ -39,7 +38,12 @@ std::string Card::displayCard()
 		case Rank::LJ: cardString += "LJ"; break;
 		case Rank::BJ: cardString += "BJ"; break;
 	}
-	return cardString;
+	std::string cardDisplay = "";
+
+	cardDisplay += "| " + cardString + " |";
+
+
+	return cardDisplay;
 
 }
 
