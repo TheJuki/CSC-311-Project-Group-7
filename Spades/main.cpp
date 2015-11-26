@@ -3,11 +3,15 @@
 #include "Card.h"
 #include "deck.h"
 #include "player.h"
+#include <ctime>
 
 using namespace std;
 
 int main()
 {
+	//For Random Shuffle
+	srand(time(0));
+
 	//Header
 	std::cout << "*****************************************************************" << std::endl
 		<< "*                             Spades                            *" << std::endl

@@ -6,14 +6,13 @@ using namespace std;
 #include "Card.h"
 #include <algorithm>
 
-
 class Deck {
 private:
 	std::vector <Card*> deck;
 	std::vector <Card*> table;
 
 public:
-
+	int myrandom(int i) { return std::rand() % i; }
 	Deck() {
 		for (int suit = 0; suit <= 3; suit++) {
 			//begin inner loop for cardinal value
@@ -34,6 +33,8 @@ public:
 		deck.push_back(lilJoker);
 		Card * bigJoker = new Card(Suit::SPADES, Rank::BJ);
 		deck.push_back(bigJoker);
+		//Shuffle
+		random_shuffle(deck.begin(), deck.end());
 	}
 	std::vector <Card*> getTable() { return table; }
 	std::vector <Card*> getDeck() { return deck; }

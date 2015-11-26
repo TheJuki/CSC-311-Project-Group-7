@@ -56,8 +56,6 @@ bool Player::checkPlay(Card * playedCard, std::vector <Card*> table) {
 
 void Player::randomDeal(std::vector <Card*> deck) {
 
-	random_shuffle(deck.begin(), deck.end());
-
 	for (int i = 0; i < 13; ++i)
 	{
 		Player::hand.push_back(deck.at(deck.size() - 1));
