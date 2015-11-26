@@ -43,9 +43,6 @@ int main()
 	string str;
 	getline(cin, str);
 	cout << endl;
-	puts("-----------------------------------");
-	puts(" Your Hand");
-	puts("-----------------------------------");
 
 	//Create Deck
 	Deck deck = Deck();
@@ -53,14 +50,68 @@ int main()
 	//Create Player
 	Player player1 = Player();
 
+	//Create Player
+	Player player2 = Player();
+
 	//Create hand for Player
 	player1.randomDeal(deck.getDeck());
 
-	player1.displayHand();
-	puts("\n-----------------------------------");
+	//Create hand for Player
+	player2.randomDeal(deck.getDeck());
 
-	cout << endl << " Enter the card to play: ";
+	while (true)
+	{
+		if (player1.getHand().size() == 0)
+		{
+			break;
+		}
+		puts("\n-----------------------------------");
+		puts(" Your Hand");
+		puts("-----------------------------------");
+		player1.displayHand();
+		puts("\n-----------------------------------");
+		cout << endl << " Enter the card to play: ";
+		string cardPlayed = "";
+		cin >> cardPlayed;
+		Card * playerCard;
+		if (cardPlayed.length() < 2)
+		{
+			cout << endl << " Card length invalid. Must be in this format: 'H2'";
+		}
+		else
+		{
+			playerCard = player1.checkCard(cardPlayed.c_str());
+			if (playerCard == NULL)
+			{
+				cout << endl << " Card invalid. Must be in this format: 'H2'";
+			}
+			else
+			{
+				playerCard = player1.makePlay(playerCard, deck.getTable());
+				if (playerCard != NULL)
+				{
+					cout << endl << playerCard->displayCard();
+				}
+			}
+
+		}
+	} // end while
+
+	if (player1.getBookNum() > player2.getBookNum())
+	{
+		puts("\n-----------------------------------");
+		cout << endl << endl << " Player 1 wins with " << player1.getBookNum() << " books" << endl;
+		puts("-----------------------------------");
+	}
+	else
+	{
+		puts("\n-----------------------------------");
+		cout << endl << endl << " Player 2 wins with " << player1.getBookNum() << " books" << endl;
+		puts("-----------------------------------");
+	}
+
+	getline(cin, str);
 	getline(cin, str);
 
     return 0;
-}
+} // end main

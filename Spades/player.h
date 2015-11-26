@@ -16,10 +16,12 @@ public:
 	int getBookNum() { return books; }
 
 	void sortHand();
-	Card * makePlay(Suit suit, Rank rank, std::vector <Card*> table);
+	Card * makePlay(Card * playedCard, std::vector <Card*> table);
 	bool checkPlay(Card * playedCard, std::vector <Card*> table);
 	void randomDeal(std::vector <Card*> deck);
 	void displayHand();
+	Card * checkCard(const char * card);
+	std::vector <Card *> getHand();
 
 };
 
