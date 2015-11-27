@@ -9,226 +9,207 @@ Authors    : Justin Kirk,
 			 Alan Bodiford
 Description: Code for CSC 311 Spades Project
 			 Server
+
 */
+
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
-
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include<stdio.h>
+#include<winsock2.h>
 #include <iostream>
 
-// Need to link with Ws2_32.lib
-#pragma comment (lib, "Ws2_32.lib")
+#pragma comment(lib, "ws2_32.lib") //Winsock Library
 
-#define DEFAULT_BUFLEN 512
-#define DEFAULT_PORT "8888"
-
-int main(void)
-{
-	WSADATA wsaData;
-	int iResult;
-
-	SOCKET ListenSocket = INVALID_SOCKET;
-	SOCKET ClientSocket = INVALID_SOCKET;
-
-	struct addrinfo *result = NULL;
-	struct addrinfo hints;
-
-	char recvbuf[DEFAULT_BUFLEN];
-	int recvbuflen = DEFAULT_BUFLEN;
-
-	//Header
-	std::cout << "*****************************************************************" << std::endl
-		<< "*                         Spades Server                         *" << std::endl
-		<< "*****************************************************************" << std::endl
-		<< "*          Justin Kirk, Richard McIlwain, Jesse Bryant          *" << std::endl
-		<< "*****************************************************************" << std::endl
-		<< "*               Arlando Boykin, Alan Bodiford                   *" << std::endl
-		<< "*****************************************************************" << std::endl
-		<< "*                    CSC 311 Spades Project                     *" << std::endl
-		<< "*****************************************************************" << std::endl
-		<< "\n\n";
-
-	puts(" Starting Spades Server V1.0");
-	puts("-----------------------------------");
-
-	// Initialize Winsock
-	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (iResult != 0) {
-		printf("WSAStartup failed with error: %d\n", iResult);
-		return 1;
-	}
-	puts(" Winsock Initialized");
-
-	ZeroMemory(&hints, sizeof(hints));
-	hints.ai_family = AF_INET; // IPv4
-	hints.ai_socktype = SOCK_STREAM; // Connection oriented TCP protocol
-	hints.ai_protocol = IPPROTO_TCP; //TCP protocol
-	hints.ai_flags = AI_PASSIVE; //For INADDR_ANY 
-
-	// Resolve the server address and port
-	iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
-	if (iResult != 0) {
-		printf("getaddrinfo failed with error: %d\n", iResult);
-		WSACleanup();
-		return 1;
-	}
-
-	puts(" Server address and port Initialized");
-
-	// Create a SOCKET for connecting to server
-	ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-	if (ListenSocket == INVALID_SOCKET) {
-		printf("socket failed with error: %ld\n", WSAGetLastError());
-		freeaddrinfo(result);
-		WSACleanup();
-		return 1;
-	}
-
-	puts(" Server SOCKET created");
-
-	// Setup the TCP listening socket
-	iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-	if (iResult == SOCKET_ERROR) {
-		printf("bind failed with error: %d\n", WSAGetLastError());
-		freeaddrinfo(result);
-		closesocket(ListenSocket);
-		WSACleanup();
-		return 1;
-	}
-
-	puts(" TCP listening socket setup");
-
-	freeaddrinfo(result);
-
-	iResult = listen(ListenSocket, SOMAXCONN);
-	if (iResult == SOCKET_ERROR) {
-		printf("listen failed with error: %d\n", WSAGetLastError());
-		closesocket(ListenSocket);
-		WSACleanup();
-		return 1;
-	}
-
-	puts(" Listening for a connection...");
-
-	// Accept a client socket
-	while ((ClientSocket = accept(ListenSocket, NULL, NULL)) != INVALID_SOCKET)
+	int main(int argc, char *argv[])
 	{
-		if (ClientSocket == INVALID_SOCKET) {
-			printf("accept failed with error: %d\n", WSAGetLastError());
-			closesocket(ListenSocket);
-			WSACleanup();
-			return 1;
+		WSADATA wsa;
+		SOCKET master, new_socket, client_socket[30], s;
+		struct sockaddr_in server, address;
+		int max_clients = 2, activity, addrlen, i, valread;
+		char *message = "Connected \r\n";
+
+		//Header
+		std::cout << "*****************************************************************" << std::endl
+			<< "*                         Spades Server                         *" << std::endl
+			<< "*****************************************************************" << std::endl
+			<< "*          Justin Kirk, Richard McIlwain, Jesse Bryant          *" << std::endl
+			<< "*****************************************************************" << std::endl
+			<< "*               Arlando Boykin, Alan Bodiford                   *" << std::endl
+			<< "*****************************************************************" << std::endl
+			<< "*                    CSC 311 Spades Project                     *" << std::endl
+			<< "*****************************************************************" << std::endl
+			<< "\n\n";
+
+		puts(" Starting Spades Server V1.0");
+		puts("-----------------------------------");
+
+		//Buffer
+		int MAXRECV = 1024;
+		//set of socket descriptors
+		fd_set readfds;
+		//1 extra for null character, string termination
+		char *buffer;
+		buffer = (char*)malloc((MAXRECV + 1) * sizeof(char));
+
+		for (i = 0; i < 30; i++)
+		{
+			client_socket[i] = 0;
 		}
 
-		puts("\n Client accepted: ");
+		printf("\nInitialising Winsock...");
+		if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		{
+			printf("Failed. Error Code : %d", WSAGetLastError());
+			exit(EXIT_FAILURE);
+		}
 
-		//Print client's socket
-		int len = sizeof(struct sockaddr);
-		struct sockaddr_in sockAddr;
-		getsockname(ClientSocket, (struct sockaddr *) &sockAddr, &len);
-		fprintf(stderr, " %s:%d\n", inet_ntoa(sockAddr.sin_addr),
-			ntohs(sockAddr.sin_port));
+		printf("Initialised.\n");
 
-		// No longer need server socket
-		closesocket(ListenSocket);
+		//Create a socket
+		if ((master = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+		{
+			printf("Could not create socket : %d", WSAGetLastError());
+			exit(EXIT_FAILURE);
+		}
 
-		// Receive until the peer shuts down the connection
-		do {
-			puts("\n Waiting for a message...\n");
-			iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-			if (iResult > 0) {
-				recvbuf[iResult-1] = '\0';
-				puts(recvbuf);
-				char * foundCard;
-				foundCard = strstr(recvbuf, "Card");
-				if (foundCard != NULL)
+		printf("Socket created.\n");
+
+		//Prepare the sockaddr_in structure
+		server.sin_family = AF_INET;
+		server.sin_addr.s_addr = INADDR_ANY;
+		server.sin_port = htons(8888);
+
+		//Bind
+		if (bind(master, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR)
+		{
+			printf("Bind failed with error code : %d", WSAGetLastError());
+			exit(EXIT_FAILURE);
+		}
+
+		puts("Bind done");
+
+		//Listen to incoming connections
+		listen(master, 3);
+
+		//Accept and incoming connection
+		puts("Waiting for incoming connections...");
+
+		addrlen = sizeof(struct sockaddr_in);
+
+		while (TRUE)
+		{
+			//clear the socket fd set
+			FD_ZERO(&readfds);
+
+			//add master socket to fd set
+			FD_SET(master, &readfds);
+
+			//add child sockets to fd set
+			for (i = 0; i < max_clients; i++)
+			{
+				s = client_socket[i];
+				if (s > 0)
 				{
-					char *message = " You sent a card\n";
-					send(ClientSocket, message, recvbuflen, 0);
-				}
-				else
-				{
-					char *message = " I recieved your message client!\n";
-					send(ClientSocket, message, recvbuflen, 0);
+					FD_SET(s, &readfds);
 				}
 			}
-			else if (iResult == 0)
-				puts(" Client lost connection");
 
-		} while (iResult > 0);
+			//wait for an activity on any of the sockets, timeout is NULL , so wait indefinitely
+			activity = select(0, &readfds, NULL, NULL, NULL);
 
-		// Shutdown the connection after client quits
-		iResult = shutdown(ClientSocket, SD_SEND);
-		if (iResult == SOCKET_ERROR) {
-			printf(" shutdown failed with error: %d\n", WSAGetLastError());
-			closesocket(ClientSocket);
-			WSACleanup();
-			return 1;
+			if (activity == SOCKET_ERROR)
+			{
+				printf("select call failed with error code : %d", WSAGetLastError());
+				exit(EXIT_FAILURE);
+			}
+
+			//If something happened on the master socket , then its an incoming connection
+			if (FD_ISSET(master, &readfds))
+			{
+				if ((new_socket = accept(master, (struct sockaddr *)&address, (int *)&addrlen))<0)
+				{
+					perror("accept");
+					exit(EXIT_FAILURE);
+				}
+
+				//inform user of socket number - used in send and receive commands
+				printf("New connection , socket fd is %d , ip is : %s , port : %d \n", new_socket, inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+
+				//send new connection greeting message
+				if (send(new_socket, message, strlen(message), 0) != strlen(message))
+				{
+					perror("send failed");
+				}
+
+				puts("Welcome message sent successfully");
+
+				//add new socket to array of sockets
+				for (i = 0; i < max_clients; i++)
+				{
+					if (client_socket[i] == 0)
+					{
+						client_socket[i] = new_socket;
+						printf("Adding to list of sockets at index %d \n", i);
+						break;
+					}
+				}
+			}
+
+			//else its some IO operation on some other socket :)
+			for (i = 0; i < max_clients; i++)
+			{
+				s = client_socket[i];
+				//if client presend in read sockets             
+				if (FD_ISSET(s, &readfds))
+				{
+					//get details of the client
+					getpeername(s, (struct sockaddr*)&address, (int*)&addrlen);
+
+					//Check if it was for closing , and also read the incoming message
+					//recv does not place a null terminator at the end of the string (whilst printf %s assumes there is one).
+					valread = recv(s, buffer, MAXRECV, 0);
+
+					if (valread == SOCKET_ERROR)
+					{
+						int error_code = WSAGetLastError();
+						if (error_code == WSAECONNRESET)
+						{
+							//Somebody disconnected , get his details and print
+							printf("Host disconnected unexpectedly , ip %s , port %d \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+
+							//Close the socket and mark as 0 in list for reuse
+							closesocket(s);
+							client_socket[i] = 0;
+						}
+						else
+						{
+							printf("recv failed with error code : %d", error_code);
+						}
+					}
+					if (valread == 0)
+					{
+						//Somebody disconnected , get his details and print
+						printf("Host disconnected , ip %s , port %d \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+
+						//Close the socket and mark as 0 in list for reuse
+						closesocket(s);
+						client_socket[i] = 0;
+					}
+
+					//Echo back the message that came in
+					else
+					{
+						//add null character, if you want to use with printf/puts or other string handling functions
+						buffer[valread] = '\0';
+						printf("%s:%d - %s \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port), buffer);
+						send(s, buffer, valread, 0);
+					}
+				}
+			}
 		}
-		puts("\n Client disconnected");
-		
-		//Ready to accept another client
-		puts("\n Restarting server...");
 
-		ZeroMemory(&hints, sizeof(hints));
-		hints.ai_family = AF_INET;
-		hints.ai_socktype = SOCK_STREAM;
-		hints.ai_protocol = IPPROTO_TCP;
-		hints.ai_flags = AI_PASSIVE;
+		closesocket(s);
+		WSACleanup();
 
-		// Resolve the server address and port
-		iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
-		if (iResult != 0) {
-			printf("getaddrinfo failed with error: %d\n", iResult);
-			WSACleanup();
-			return 1;
-		}
-
-		puts(" Server address and port Initialized");
-
-		// Create a SOCKET for connecting to server
-		ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-		if (ListenSocket == INVALID_SOCKET) {
-			printf("socket failed with error: %ld\n", WSAGetLastError());
-			freeaddrinfo(result);
-			WSACleanup();
-			return 1;
-		}
-
-		puts(" Server SOCKET created");
-
-		// Setup the TCP listening socket
-		iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-		if (iResult == SOCKET_ERROR) {
-			printf("bind failed with error: %d\n", WSAGetLastError());
-			freeaddrinfo(result);
-			closesocket(ListenSocket);
-			WSACleanup();
-			return 1;
-		}
-
-		puts(" TCP listening socket setup");
-
-		freeaddrinfo(result);
-
-		iResult = listen(ListenSocket, SOMAXCONN);
-		if (iResult == SOCKET_ERROR) {
-			printf("listen failed with error: %d\n", WSAGetLastError());
-			closesocket(ListenSocket);
-			WSACleanup();
-			return 1;
-		}
-
-		puts(" Listening for a connection...");
+		return 0;
 	}
-
-	// Cleanup
-	closesocket(ClientSocket);
-	WSACleanup();
-
-	return 0;
-}
