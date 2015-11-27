@@ -29,7 +29,7 @@ public:
 	//class functions
 	bool matchSuit(Suit suit);
 	bool checkPlay(Suit suit, Rank rank);
-
+	std::string cardAsString();
 	std::string displayCard();
 };
 #endif

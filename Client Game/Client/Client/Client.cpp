@@ -25,7 +25,7 @@ Description: Code for CSC 311 Spades Project
 #include <ctime>
 
 //Prototypes
-int sendMessage(char* message);
+int sendMessage(const char* message);
 int recieveMessage();
 
 using namespace std;
@@ -102,7 +102,7 @@ int main() {
 	}
 	puts("\n Connected to Spades Server");
 	recieveMessage();
-	sendMessage("Got it");
+	sendMessage("Connected");
 
 	cout << "\n Press Enter to Start: ";
 	getline(cin, str);
@@ -146,29 +146,74 @@ int main() {
 	Deck deck = Deck();
 
 	//Create Player
-	Player player1 = Player();
+	Player player = Player();
+	bool isPlayer1 = false;
+	bool isYourTurn = false;
+	bool isRoundOne = true;
 
-	//Create Player
-	Player player2 = Player();
+	//If Player 1...
+	if (recvbuf = "0")
+	{
+		isPlayer1 = true;
+		//Create hand for Player
+		player.randomDeal(deck.getDeck());
 
-	//Create hand for Player
-	player1.randomDeal(deck.getDeck());
+		std::string deckString = "";
+		for (int i = 0; i < deck.getDeck().size(); ++i)
+		{
+			deckString += deck.getDeck()[i]->cardAsString() + " ";
+		}
+		sendMessage(deckString.c_str());
+	} // end if
+	else
+	{
+		//Clear Deck
+		deck.getDeck().clear();
 
-	//Create hand for Player
-	player2.randomDeal(deck.getDeck());
+		std::string delimiter = " ";
+		//size of string
+		size_t pos = 0;
+		//Line in file as a string
+		std::string line;
+		//string of part
+		std::string part;
+		//Deck as a string
+		std::string deckString = "";
+
+		//Get Deck from Player 1 
+		recieveMessage();
+		line = std::string(recvbuf);
+		for (int i = 0; i < 52; ++i)
+		{
+			if ((pos = line.find(delimiter)) != std::string::npos)
+			{
+				part = line.substr(0, pos);
+				deck.getDeck().push_back(player.checkCard(part.c_str()));
+				line.erase(0, pos + delimiter.length());
+			}
+		} // end for
+		player.randomDeal(deck.getDeck());
+		
+	} // end else
 
 	while (true)
 	{
-		if (player1.getHand().size() == 0)
+		if (player.getHand().size() == 0)
 		{
 			break;
 		}
 		puts("\n-----------------------------------");
 		puts(" Your Hand");
 		puts("-----------------------------------");
-		player1.displayHand();
+		player.displayHand();
+		if (!isPlayer1 && isRoundOne)
+		{
+			//Wait for Player 1
+			recieveMessage();
+			isRoundOne = false;
+		}
 		puts("\n-----------------------------------");
-		cout << endl << " Enter the card to play: ";
+		cout << endl << " Enter a card to play: ";
 		string cardPlayed = "";
 		cin >> cardPlayed;
 		Card * playerCard;
@@ -178,33 +223,34 @@ int main() {
 		}
 		else
 		{
-			playerCard = player1.checkCard(cardPlayed.c_str());
+			playerCard = player.checkCard(cardPlayed.c_str());
 			if (playerCard == NULL)
 			{
 				cout << endl << " Card invalid. Must be in this format: 'H2'";
 			}
 			else
 			{
-				playerCard = player1.makePlay(playerCard, deck.getTable());
+				playerCard = player.makePlay(playerCard, deck.getTable());
 				if (playerCard != NULL)
 				{
 					cout << endl << playerCard->displayCard();
+					sendMessage(playerCard->cardAsString().c_str());
 				}
 			}
 
 		}
 	} // end while
 
-	if (player1.getBookNum() > player2.getBookNum())
+	if (player.getBookNum() > player.getBookNum())
 	{
 		puts("\n-----------------------------------");
-		cout << endl << endl << " Player 1 wins with " << player1.getBookNum() << " books" << endl;
+		cout << endl << endl << " Player 1 wins with " << player.getBookNum() << " books" << endl;
 		puts("-----------------------------------");
 	}
 	else
 	{
 		puts("\n-----------------------------------");
-		cout << endl << endl << " Player 2 wins with " << player1.getBookNum() << " books" << endl;
+		cout << endl << endl << " Player 2 wins with " << player.getBookNum() << " books" << endl;
 		puts("-----------------------------------");
 	}
 
@@ -216,7 +262,7 @@ int main() {
 } // end main
 
 //Send a message to server
-int sendMessage(char* message)
+int sendMessage(const char* message)
 {
 	int sent = send(ServerSocket, message, recvbuflen, 0);
 	if (sent == 0)
@@ -230,7 +276,6 @@ int recieveMessage()
 	int recieved = recv(ServerSocket, recvbuf, recvbuflen, 0);
 	if (recieved > 0) {
 		recvbuf[recieved] = '\0';
-		puts(recvbuf);
 	}
 	else if (recieved == 0)
 		puts(" Server lost connection");
