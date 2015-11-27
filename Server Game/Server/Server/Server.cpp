@@ -17,13 +17,14 @@ Description: Code for CSC 311 Spades Project
 #include<stdio.h>
 #include<winsock2.h>
 #include <iostream>
+#include <sstream>
 
 #pragma comment(lib, "ws2_32.lib") //Winsock Library
 
-	int main(int argc, char *argv[])
+	int main()
 	{
 		WSADATA wsa;
-		SOCKET master, new_socket, client_socket[30], s;
+		SOCKET master, new_socket, client_socket[2], s;
 		struct sockaddr_in server, address;
 		int max_clients = 2, activity, addrlen, i, valread;
 		char *message = "Connected \r\n";
@@ -45,128 +46,129 @@ Description: Code for CSC 311 Spades Project
 
 		//Buffer
 		int MAXRECV = 1024;
-		//set of socket descriptors
+		//Set of socket descriptors
 		fd_set readfds;
-		//1 extra for null character, string termination
+		//Recieve Buffer
 		char *buffer;
 		buffer = (char*)malloc((MAXRECV + 1) * sizeof(char));
 
-		for (i = 0; i < 30; i++)
+		for (i = 0; i < max_clients; i++)
 		{
 			client_socket[i] = 0;
-		}
+		} // end for
 
-		printf("\nInitialising Winsock...");
+		printf("\n Initialising Winsock...");
 		if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		{
 			printf("Failed. Error Code : %d", WSAGetLastError());
 			exit(EXIT_FAILURE);
-		}
+		} // end if
 
 		printf("Initialised.\n");
 
 		//Create a socket
 		if ((master = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 		{
-			printf("Could not create socket : %d", WSAGetLastError());
+			printf(" Could not create socket : %d", WSAGetLastError());
 			exit(EXIT_FAILURE);
-		}
+		} // end if
 
-		printf("Socket created.\n");
+		printf(" Socket created.\n");
 
 		//Prepare the sockaddr_in structure
-		server.sin_family = AF_INET;
+		server.sin_family = AF_INET; //IPv4
 		server.sin_addr.s_addr = INADDR_ANY;
-		server.sin_port = htons(8888);
+		server.sin_port = htons(8888); //Port
 
 		//Bind
 		if (bind(master, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR)
 		{
-			printf("Bind failed with error code : %d", WSAGetLastError());
+			printf(" Bind failed with error code : %d", WSAGetLastError());
 			exit(EXIT_FAILURE);
-		}
+		} // end if
 
-		puts("Bind done");
+		puts(" Bind done");
 
 		//Listen to incoming connections
 		listen(master, 3);
 
 		//Accept and incoming connection
-		puts("Waiting for incoming connections...");
+		puts(" Waiting for a client to join...");
 
 		addrlen = sizeof(struct sockaddr_in);
 
+		//Forever loop...
 		while (TRUE)
 		{
-			//clear the socket fd set
+			//Clear the socket fd set
 			FD_ZERO(&readfds);
 
-			//add master socket to fd set
+			//Add master socket to fd set
 			FD_SET(master, &readfds);
 
-			//add child sockets to fd set
+			//Add child sockets to fd set
 			for (i = 0; i < max_clients; i++)
 			{
 				s = client_socket[i];
 				if (s > 0)
 				{
 					FD_SET(s, &readfds);
-				}
-			}
+				} // end if
+			} // end for
 
 			//wait for an activity on any of the sockets, timeout is NULL , so wait indefinitely
 			activity = select(0, &readfds, NULL, NULL, NULL);
 
 			if (activity == SOCKET_ERROR)
 			{
-				printf("select call failed with error code : %d", WSAGetLastError());
+				printf(" Select call failed with error code : %d", WSAGetLastError());
 				exit(EXIT_FAILURE);
-			}
+			} // end if
 
-			//If something happened on the master socket , then its an incoming connection
+			//Master socket error check
 			if (FD_ISSET(master, &readfds))
 			{
 				if ((new_socket = accept(master, (struct sockaddr *)&address, (int *)&addrlen))<0)
 				{
-					perror("accept");
+					perror(" Accept");
 					exit(EXIT_FAILURE);
-				}
+				} // end if
 
 				//inform user of socket number - used in send and receive commands
-				printf("New connection , socket fd is %d , ip is : %s , port : %d \n", new_socket, inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+				printf("\n New client: IP: %s:%d \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 
-				//send new connection greeting message
-				if (send(new_socket, message, strlen(message), 0) != strlen(message))
-				{
-					perror("send failed");
-				}
+				puts(" Client reached\n");
 
-				puts("Welcome message sent successfully");
-
-				//add new socket to array of sockets
+				//Add new client socket
 				for (i = 0; i < max_clients; i++)
 				{
 					if (client_socket[i] == 0)
 					{
 						client_socket[i] = new_socket;
-						printf("Adding to list of sockets at index %d \n", i);
+						//Send connected!
+						std::stringstream strs;
+						strs << i;
+						std::string temp = strs.str();
+						const char* clientNum = temp.c_str();
+						if (send(new_socket, clientNum, strlen(clientNum), 0) != strlen(clientNum))
+						{
+							perror(" Send failed");
+						} // end if
 						break;
-					}
-				}
-			}
+					} // end if
+				} // end for
+			} // end if
 
-			//else its some IO operation on some other socket :)
+			//for each client...
 			for (i = 0; i < max_clients; i++)
 			{
 				s = client_socket[i];
 				//if client presend in read sockets             
 				if (FD_ISSET(s, &readfds))
 				{
-					//get details of the client
+					//Get address
 					getpeername(s, (struct sockaddr*)&address, (int*)&addrlen);
 
-					//Check if it was for closing , and also read the incoming message
-					//recv does not place a null terminator at the end of the string (whilst printf %s assumes there is one).
 					valread = recv(s, buffer, MAXRECV, 0);
 
 					if (valread == SOCKET_ERROR)
@@ -174,42 +176,41 @@ Description: Code for CSC 311 Spades Project
 						int error_code = WSAGetLastError();
 						if (error_code == WSAECONNRESET)
 						{
-							//Somebody disconnected , get his details and print
-							printf("Host disconnected unexpectedly , ip %s , port %d \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+							//Client disconnected
+							printf(" Client disconnected: %s:%d \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 
 							//Close the socket and mark as 0 in list for reuse
 							closesocket(s);
 							client_socket[i] = 0;
-						}
+						} // end if
 						else
 						{
-							printf("recv failed with error code : %d", error_code);
-						}
-					}
+							printf(" recv failed with error code : %d", error_code);
+						} // end else
+					} // end if
 					if (valread == 0)
 					{
-						//Somebody disconnected , get his details and print
-						printf("Host disconnected , ip %s , port %d \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+						//Client disconnected
+						printf(" Client disconnected: %s:%d \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 
-						//Close the socket and mark as 0 in list for reuse
+						//Close socket 
 						closesocket(s);
 						client_socket[i] = 0;
-					}
-
-					//Echo back the message that came in
+					} // end if
 					else
 					{
-						//add null character, if you want to use with printf/puts or other string handling functions
+						//add null character
 						buffer[valread] = '\0';
-						printf("%s:%d - %s \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port), buffer);
+						printf(" %s:%d - %s \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port), buffer);
 						send(s, buffer, valread, 0);
-					}
-				}
-			}
-		}
+					} // end else
+				} // end if
+			} // end for
+		} // end while
 
+		//Close and cleanup
 		closesocket(s);
 		WSACleanup();
 
 		return 0;
-	}
+	} // end main
