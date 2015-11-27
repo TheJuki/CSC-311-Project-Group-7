@@ -87,8 +87,8 @@ int main() {
 
 	// Address Info
 	SOCKADDR_IN addr;
-	//addr.sin_addr.s_addr = inet_addr("192.168.1.135"); //Server IP
-	addr.sin_addr.s_addr = inet_addr("127.0.0.1"); //localhost IP
+	addr.sin_addr.s_addr = inet_addr("192.168.1.135"); //Server IP
+	//addr.sin_addr.s_addr = inet_addr("127.0.0.1"); //localhost IP
 	addr.sin_family = AF_INET; //IPv4
 	addr.sin_port = htons(8888); //Port
 
@@ -151,8 +151,10 @@ int main() {
 	bool isYourTurn = false;
 	bool isRoundOne = true;
 
+	std::string playerNum = std::string(recvbuf);
+
 	//If Player 1...
-	if (recvbuf = "0")
+	if (playerNum == "0")
 	{
 		isPlayer1 = true;
 		//Create hand for Player
