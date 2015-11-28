@@ -212,15 +212,12 @@ int main() {
 		{
 			//Wait for Player 1
 			recieveMessage();
-			isRoundOne = false;
-		}
-		else if(!isRoundOne)
-		{
-			//Wait for Player's turn
-			recieveMessage();
+			
 			deck.getTable().clear();
 			//Display Table
+			puts("\n-----------------------------------");
 			cout << endl << "Current Table" << endl;
+			puts("\n-----------------------------------");
 			line = std::string(recvbuf);
 			for (int i = 0; i < 2; ++i)
 			{
@@ -228,11 +225,34 @@ int main() {
 				{
 					part = line.substr(0, pos);
 					deck.getTable().push_back(player.checkCard(part.c_str()));
-					deck.getTable().back()->displayCard();
+					cout << deck.getTable().back()->displayCard();
 					line.erase(0, pos + delimiter.length());
 				}
 			} // end for
 		}
+		else if(!isRoundOne)
+		{
+			//Wait for Player's turn
+			recieveMessage();
+
+			deck.getTable().clear();
+			//Display Table
+			puts("\n-----------------------------------");
+			cout << endl << "Current Table" << endl;
+			puts("\n-----------------------------------");
+			line = std::string(recvbuf);
+			for (int i = 0; i < 2; ++i)
+			{
+				if ((pos = line.find(delimiter)) != std::string::npos)
+				{
+					part = line.substr(0, pos);
+					deck.getTable().push_back(player.checkCard(part.c_str()));
+					cout << deck.getTable().back()->displayCard();
+					line.erase(0, pos + delimiter.length());
+				}
+			} // end for
+		}
+		isRoundOne = false;
 
 		puts("\n-----------------------------------");
 		cout << endl << " Enter a card to play: ";
