@@ -211,9 +211,7 @@ int main() {
 		if (!isPlayer1 && isRoundOne)
 		{
 			//Wait for Player 1
-			puts("\nWaiting for opponent...");
-			recieveMessage();
-			sendMessage("getTable");
+			puts("\n\nWaiting for opponent...");
 			recieveMessage();
 			deck.getTable().clear();
 			//Display Table
@@ -221,16 +219,19 @@ int main() {
 			cout << endl << "Current Table" << endl;
 			puts("\n-----------------------------------");
 			line = std::string(recvbuf);
-			deck.getTable().push_back(player.checkCard(line.c_str()));
-			cout << deck.getTable().back()->displayCard();
+			Card * card = player.checkCard(line.c_str());
+			if (card != NULL)
+			{
+				deck.getTable().push_back(card);
+				cout << deck.getTable().back()->displayCard();
+			}
+			
 		}
 		else if(!isRoundOne)
 		{
-			puts("\nWaiting for opponent...");
+			puts("\n\nWaiting for opponent...");
 			//Wait for Player's turn
-			sendMessage("getTable");
 			recieveMessage();
-
 			deck.getTable().clear();
 			//Display Table
 			puts("\n-----------------------------------");
@@ -238,8 +239,12 @@ int main() {
 			puts("\n-----------------------------------");
 			line = std::string(recvbuf);
 			line = std::string(recvbuf);
-			deck.getTable().push_back(player.checkCard(line.c_str()));
-			cout << deck.getTable().back()->displayCard();
+			Card * card = player.checkCard(line.c_str());
+			if (card != NULL)
+			{
+				deck.getTable().push_back(card);
+				cout << deck.getTable().back()->displayCard();
+			}
 		}
 		isRoundOne = false;
 
