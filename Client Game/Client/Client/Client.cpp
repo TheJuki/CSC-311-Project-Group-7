@@ -211,28 +211,24 @@ int main() {
 		if (!isPlayer1 && isRoundOne)
 		{
 			//Wait for Player 1
+			puts("\nWaiting for opponent...");
 			recieveMessage();
-			
+			sendMessage("getTable");
+			recieveMessage();
 			deck.getTable().clear();
 			//Display Table
 			puts("\n-----------------------------------");
 			cout << endl << "Current Table" << endl;
 			puts("\n-----------------------------------");
 			line = std::string(recvbuf);
-			for (int i = 0; i < 2; ++i)
-			{
-				if ((pos = line.find(delimiter)) != std::string::npos)
-				{
-					part = line.substr(0, pos);
-					deck.getTable().push_back(player.checkCard(part.c_str()));
-					cout << deck.getTable().back()->displayCard();
-					line.erase(0, pos + delimiter.length());
-				}
-			} // end for
+			deck.getTable().push_back(player.checkCard(line.c_str()));
+			cout << deck.getTable().back()->displayCard();
 		}
 		else if(!isRoundOne)
 		{
+			puts("\nWaiting for opponent...");
 			//Wait for Player's turn
+			sendMessage("getTable");
 			recieveMessage();
 
 			deck.getTable().clear();
@@ -241,16 +237,9 @@ int main() {
 			cout << endl << "Current Table" << endl;
 			puts("\n-----------------------------------");
 			line = std::string(recvbuf);
-			for (int i = 0; i < 2; ++i)
-			{
-				if ((pos = line.find(delimiter)) != std::string::npos)
-				{
-					part = line.substr(0, pos);
-					deck.getTable().push_back(player.checkCard(part.c_str()));
-					cout << deck.getTable().back()->displayCard();
-					line.erase(0, pos + delimiter.length());
-				}
-			} // end for
+			line = std::string(recvbuf);
+			deck.getTable().push_back(player.checkCard(line.c_str()));
+			cout << deck.getTable().back()->displayCard();
 		}
 		isRoundOne = false;
 
