@@ -16,9 +16,9 @@ public:
 	int getBookNum() { return books; }
 
 	void sortHand();
-	Card * makePlay(Card * playedCard, std::vector <Card*> table);
-	bool checkPlay(Card * playedCard, std::vector <Card*> table);
-	void randomDeal(std::vector <Card*> deck);
+	Card * makePlay(Card * playedCard, std::vector <Card*> &table);
+	bool checkPlay(Card * playedCard, std::vector <Card*> &table);
+	void randomDeal(std::vector <Card*> &deck);
 	void displayHand();
 	Card * checkCard(const char * card);
 	std::vector <Card *> getHand();

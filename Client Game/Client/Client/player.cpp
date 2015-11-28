@@ -9,7 +9,7 @@ void Player::sortHand()
 	);
 }
 
-Card * Player::makePlay(Card * playedCard, std::vector <Card*> table) {
+Card * Player::makePlay(Card * playedCard, std::vector <Card*> &table) {
 
 	bool foundIt = false;
 	int cardLoc = 0;
@@ -42,7 +42,7 @@ Card * Player::makePlay(Card * playedCard, std::vector <Card*> table) {
 	return playedCard;
 }
 
-bool Player::checkPlay(Card * playedCard, std::vector <Card*> table) {
+bool Player::checkPlay(Card * playedCard, std::vector <Card*> &table) {
 
 	Card * leadCard = table.front();
 	bool foundIt = false;
@@ -69,7 +69,7 @@ bool Player::checkPlay(Card * playedCard, std::vector <Card*> table) {
 
 }
 
-void Player::randomDeal(std::vector <Card*> deck) {
+void Player::randomDeal(std::vector <Card*> &deck) {
 
 	for (int i = 0; i < 13; ++i)
 	{

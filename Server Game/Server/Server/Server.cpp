@@ -51,6 +51,10 @@ Description: Code for CSC 311 Spades Project
 		//Recieve Buffer
 		char *buffer;
 		buffer = (char*)malloc((MAXRECV + 1) * sizeof(char));
+		char *p1Buffer;
+		p1Buffer = (char*)malloc((MAXRECV + 1) * sizeof(char));
+		char *p2Buffer;
+		p2Buffer = (char*)malloc((MAXRECV + 1) * sizeof(char));
 
 		for (i = 0; i < max_clients; i++)
 		{
@@ -200,9 +204,27 @@ Description: Code for CSC 311 Spades Project
 					else
 					{
 						//add null character
-						buffer[valread] = '\0';
-						printf(" %s:%d - %s \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port), buffer);
-						send(s, buffer, valread, 0);
+						if (valread > 0)
+						{
+							if (i == 0)
+							{
+								if (client_socket[1] != 0)
+								{
+									buffer[valread] = '\0';
+									p1Buffer = buffer;
+									printf(" %s:%d - %s \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port), p2Buffer);
+									send(client_socket[1], p2Buffer, valread, 0);
+								}
+							}
+							else if (i == 1)
+							{
+								buffer[valread] = '\0';
+								p2Buffer = buffer;
+								printf(" %s:%d - %s \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port), p1Buffer);
+								send(client_socket[0], p1Buffer, valread, 0);
+							}
+						}
+						
 					} // end else
 				} // end if
 			} // end for
