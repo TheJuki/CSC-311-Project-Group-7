@@ -125,7 +125,7 @@ Card * Player::checkCard(const char * card) {
 		return NULL;
 }
 
-std::vector <Card *> Player::getHand()
+std::vector <Card *>& Player::getHand()
 {
 	return hand;
 }

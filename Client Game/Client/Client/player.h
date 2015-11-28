@@ -21,7 +21,7 @@ public:
 	void randomDeal(std::vector <Card*> &deck);
 	void displayHand();
 	Card * checkCard(const char * card);
-	std::vector <Card *> getHand();
+	std::vector <Card *>& getHand();
 
 };
 
