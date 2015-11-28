@@ -170,7 +170,7 @@ int main() {
 		player.randomDeal(deck.getDeck());
 
 		std::string deckString = "";
-		for (int i = 0; i < deck.getDeck().size(); ++i)
+		for (int i = 0; i < (int)deck.getDeck().size(); ++i)
 		{
 			deckString += deck.getDeck()[i]->cardAsString() + " ";
 		}
@@ -204,10 +204,7 @@ int main() {
 		{
 			break;
 		}
-		puts("\n-----------------------------------");
-		puts(" Your Hand");
-		puts("-----------------------------------");
-		player.displayHand();
+		
 		if (!isPlayer1 && isRoundOne)
 		{
 			//Wait for Player 1
@@ -248,33 +245,42 @@ int main() {
 		}
 		isRoundOne = false;
 
-		puts("\n-----------------------------------");
-		cout << endl << " Enter a card to play: ";
-		string cardPlayed = "";
-		cin >> cardPlayed;
-		Card * playerCard;
-		if (cardPlayed.length() < 2)
+		bool goodCard = false;
+		while (!goodCard)
 		{
-			cout << endl << " Card length invalid. Must be in this format: 'H2'";
-		}
-		else
-		{
-			playerCard = player.checkCard(cardPlayed.c_str());
-			if (playerCard == NULL)
+			puts("\n-----------------------------------");
+			puts(" Your Hand");
+			puts("-----------------------------------");
+			player.displayHand();
+			puts("\n-----------------------------------");
+			cout << endl << "\n Enter a card to play: ";
+			string cardPlayed = "";
+			cin >> cardPlayed;
+			Card * playerCard;
+			if (cardPlayed.length() < 2)
 			{
-				cout << endl << " Card invalid. Must be in this format: 'H2'";
+				cout << endl << " Card length invalid. Must be in this format: 'H2'";
 			}
 			else
 			{
-				playerCard = player.makePlay(playerCard, deck.getTable());
-				if (playerCard != NULL)
+				playerCard = player.checkCard(cardPlayed.c_str());
+				if (playerCard == NULL)
 				{
-					cout << endl << playerCard->displayCard();
-					sendMessage(playerCard->cardAsString().c_str());
+					cout << endl << " Card invalid. Must be in this format: 'H2'";
 				}
-			}
+				else
+				{
+					playerCard = player.makePlay(playerCard, deck.getTable());
+					if (playerCard != NULL)
+					{
+						cout << endl << playerCard->displayCard();
+						goodCard = true;
+						sendMessage(playerCard->cardAsString().c_str());
+					}
+				}
 
-		}
+			} // end else
+		} // end while
 	} // end while
 
 	if (player.getBookNum() > player.getBookNum())
