@@ -221,6 +221,7 @@ int main() {
 			deck.getTable().clear();
 			//Display Table
 			cout << endl << "Current Table" << endl;
+			line = std::string(recvbuf);
 			for (int i = 0; i < 2; ++i)
 			{
 				if ((pos = line.find(delimiter)) != std::string::npos)
