@@ -36,8 +36,8 @@ public:
 		//Shuffle
 		random_shuffle(deck.begin(), deck.end());
 	}
-	std::vector <Card*> getTable() { return table; }
-	std::vector <Card*> getDeck() { return deck; }
+	std::vector <Card*>& getTable() { return table; }
+	std::vector <Card*>& getDeck() { return deck; }
 
 };
 
