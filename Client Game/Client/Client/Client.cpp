@@ -150,6 +150,15 @@ int main() {
 	bool isPlayer1 = false;
 	bool isYourTurn = false;
 	bool isRoundOne = true;
+	std::string delimiter = " ";
+	//size of string
+	size_t pos = 0;
+	//Line in file as a string
+	std::string line;
+	//string of part
+	std::string part;
+	//Deck as a string
+	std::string deckString = "";
 
 	std::string playerNum = std::string(recvbuf);
 
@@ -172,20 +181,11 @@ int main() {
 		//Clear Deck
 		deck.getDeck().clear();
 
-		std::string delimiter = " ";
-		//size of string
-		size_t pos = 0;
-		//Line in file as a string
-		std::string line;
-		//string of part
-		std::string part;
-		//Deck as a string
-		std::string deckString = "";
-
 		//Get Deck from Player 1 
+		sendMessage("GetDeck");
 		recieveMessage();
 		line = std::string(recvbuf);
-		for (int i = 0; i < 52; ++i)
+		for (int i = 0; i < 13; ++i)
 		{
 			if ((pos = line.find(delimiter)) != std::string::npos)
 			{
@@ -214,6 +214,25 @@ int main() {
 			recieveMessage();
 			isRoundOne = false;
 		}
+		else if(!isRoundOne)
+		{
+			//Wait for Player's turn
+			recieveMessage();
+			deck.getTable().clear();
+			//Display Table
+			cout << endl << "Current Table" << endl;
+			for (int i = 0; i < 2; ++i)
+			{
+				if ((pos = line.find(delimiter)) != std::string::npos)
+				{
+					part = line.substr(0, pos);
+					deck.getTable().push_back(player.checkCard(part.c_str()));
+					deck.getTable().back()->displayCard();
+					line.erase(0, pos + delimiter.length());
+				}
+			} // end for
+		}
+
 		puts("\n-----------------------------------");
 		cout << endl << " Enter a card to play: ";
 		string cardPlayed = "";
