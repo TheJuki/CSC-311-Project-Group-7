@@ -1,13 +1,25 @@
-﻿Build started 11/18/2015 7:39:09 AM.
+﻿Build started 12/1/2015 10:18:03 PM.
      1>Project "C:\Users\theju\Documents\GitHub\CSC-311-Project-Group-7\Client Game\Client\Client\Client.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Client.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Client.cpp card.cpp deck.cpp player.cpp
+         player.cpp
+     1>c:\users\theju\documents\github\csc-311-project-group-7\client game\client\client\player.cpp(30): warning C4018: '<': signed/unsigned mismatch
+     1>c:\users\theju\documents\github\csc-311-project-group-7\client game\client\client\player.cpp(73): warning C4018: '<': signed/unsigned mismatch
+         deck.cpp
+         card.cpp
          Client.cpp
+     1>c:\users\theju\documents\github\csc-311-project-group-7\client game\client\client\client.cpp(113): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+     1>c:\users\theju\documents\github\csc-311-project-group-7\client game\client\client\client.cpp(329): warning C4018: '<': signed/unsigned mismatch
+     1>c:\users\theju\documents\github\csc-311-project-group-7\client game\client\client\client.cpp(343): warning C4018: '<': signed/unsigned mismatch
+         Generating Code...
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\theju\Documents\GitHub\CSC-311-Project-Group-7\Client Game\Client\Debug\Client.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\theju\Documents\GitHub\CSC-311-Project-Group-7\Client Game\Client\Debug\Client.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\theju\Documents\GitHub\CSC-311-Project-Group-7\Client Game\Client\Debug\Client.lib" /MACHINE:X86 Debug\Client.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\theju\Documents\GitHub\CSC-311-Project-Group-7\Client Game\Client\Debug\Client.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\theju\Documents\GitHub\CSC-311-Project-Group-7\Client Game\Client\Debug\Client.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\theju\Documents\GitHub\CSC-311-Project-Group-7\Client Game\Client\Debug\Client.lib" /MACHINE:X86 Debug\card.obj
+         Debug\Client.obj
+         Debug\deck.obj
+         Debug\player.obj
          Client.vcxproj -> C:\Users\theju\Documents\GitHub\CSC-311-Project-Group-7\Client Game\Client\Debug\Client.exe
      1>Done Building Project "C:\Users\theju\Documents\GitHub\CSC-311-Project-Group-7\Client Game\Client\Client\Client.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:01.96
+Time Elapsed 00:00:05.18

@@ -1,7 +1,7 @@
 /*
 File       : Client.cpp
 Program    : CSC 311 Project
-Due Date   : November 2015
+Due Date   : Due Date   : December 2, 2015
 Authors    : Justin Kirk,
 			 Richard McIlwain,
 			 Jesse Bryant,
@@ -48,6 +48,7 @@ int main() {
 	WSADATA wsaData;
 
 	int iResult;
+	int recievedMessage;
 
 	//Header
 	std::cout << "*****************************************************************" << std::endl
@@ -177,7 +178,14 @@ int main() {
 			deckString += deck.getDeck()[i]->cardAsString() + " ";
 		}
 		sendMessage(deckString.c_str());
-		recieveMessage();
+		recievedMessage = recieveMessage();
+		if (recievedMessage <= 0)
+		{
+			cout << "\n Press Enter to Exit: ";
+			getline(cin, str);
+			getline(cin, str);
+			return 1;
+		}
 	} // end if
 	else
 	{
@@ -187,7 +195,14 @@ int main() {
 
 		//Get Deck from Player 1 
 		sendMessage("GetDeck");
-		recieveMessage();
+		recievedMessage = recieveMessage();
+		if (recievedMessage <= 0)
+		{
+			cout << "\n Press Enter to Exit: ";
+			getline(cin, str);
+			getline(cin, str);
+			return 1;
+		}
 		line = std::string(recvbuf);
 		for (int i = 0; i < 13; ++i)
 		{
@@ -212,7 +227,14 @@ int main() {
 		{
 			//Wait for Player 1
 			puts("\n\n Waiting for opponent...");
-			recieveMessage();
+			recievedMessage = recieveMessage();
+			if (recievedMessage <= 0)
+			{
+				cout << "\n Press Enter to Exit: ";
+				getline(cin, str);
+				getline(cin, str);
+				return 1;
+			}
 			deck.getTable().clear();
 			line = std::string(recvbuf);
 			Card * card = player.checkCard(line.c_str());
@@ -226,7 +248,14 @@ int main() {
 		else if(!isRoundOne)
 		{
 			puts("\n\n Waiting for opponent...");
-			recieveMessage();
+			recievedMessage = recieveMessage();
+			if (recievedMessage <= 0)
+			{
+				cout << "\n Press Enter to Exit: ";
+				getline(cin, str);
+				getline(cin, str);
+				return 1;
+			}
 			//Wait for Player's turn
 			deck.getTable().clear();
 			
@@ -390,7 +419,14 @@ int main() {
 	string temp_str = std::to_string(player.getBookNum());
 	sendMessage(temp_str.c_str());
 	//Get Book Count
-	recieveMessage();
+	recievedMessage = recieveMessage();
+	if (recievedMessage <= 0)
+	{
+		cout << "\n Press Enter to Exit: ";
+		getline(cin, str);
+		getline(cin, str);
+		return 1;
+	}
 	if (player.getBookNum() > atoi(recvbuf))
 	{
 		puts("\n-----------------------------------");
@@ -403,7 +439,7 @@ int main() {
 		cout << endl << endl << " Opponent wins with " << atoi(recvbuf) << " books" << endl;
 		puts("-----------------------------------");
 	}
-
+	cout << "\n Press Enter to Exit: ";
 	getline(cin, str);
 	getline(cin, str);
 

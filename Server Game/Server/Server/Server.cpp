@@ -1,7 +1,7 @@
 /*
 File       : Server.cpp
 Program    : CSC 311 Project
-Due Date   : November 2015
+Due Date   : December 2, 2015
 Authors    : Justin Kirk,
 			 Richard McIlwain,
 			 Jesse Bryant,
@@ -120,7 +120,7 @@ Description: Code for CSC 311 Spades Project
 				} // end if
 			} // end for
 
-			//wait for an activity on any of the sockets, timeout is NULL , so wait indefinitely
+			//Wait for activity
 			activity = select(0, &readfds, NULL, NULL, NULL);
 
 			if (activity == SOCKET_ERROR)
@@ -138,7 +138,7 @@ Description: Code for CSC 311 Spades Project
 					exit(EXIT_FAILURE);
 				} // end if
 
-				//inform user of socket number - used in send and receive commands
+				//New Client Added
 				printf("\n New client: IP: %s:%d \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 
 				puts(" Client reached\n");
@@ -149,7 +149,6 @@ Description: Code for CSC 311 Spades Project
 					if (client_socket[i] == 0)
 					{
 						client_socket[i] = new_socket;
-						//Send connected!
 						std::stringstream strs;
 						strs << i;
 						std::string temp = strs.str();
