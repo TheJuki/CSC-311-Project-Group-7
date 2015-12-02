@@ -29,13 +29,24 @@ Card * Player::makePlay(Card * playedCard, std::vector <Card*> &table) {
 		return NULL;
 	}
 	else {
-		if (table.size() > 0 && playedCard->getSuit() == table.front()->getSuit() || playedCard->getSuit() == Suit::SPADES)
+		if (table.size() > 0 && playedCard->getSuit() == table.front()->getSuit())
 		{
-
 			table.push_back(playedCard);
 			hand.erase(hand.begin() + cardLoc);
 			hand.shrink_to_fit();
 		}
+		else if (table.size() > 0 && playedCard->getSuit() == Suit::SPADES)
+		{
+			table.push_back(playedCard);
+			hand.erase(hand.begin() + cardLoc);
+			hand.shrink_to_fit();
+		}
+		else
+		{
+			hand.erase(hand.begin() + cardLoc);
+			hand.shrink_to_fit();
+		}
+
 
 		return playedCard;
 	}

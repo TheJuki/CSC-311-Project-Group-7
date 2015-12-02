@@ -87,8 +87,8 @@ int main() {
 
 	// Address Info
 	SOCKADDR_IN addr;
-	addr.sin_addr.s_addr = inet_addr("10.20.123.173"); //Server IP
-	//addr.sin_addr.s_addr = inet_addr("127.0.0.1"); //localhost IP
+	//addr.sin_addr.s_addr = inet_addr("10.20.123.173"); //Server IP
+	addr.sin_addr.s_addr = inet_addr("127.0.0.1"); //localhost IP
 	addr.sin_family = AF_INET; //IPv4
 
 	addr.sin_port = htons(8888); //Port
@@ -166,6 +166,7 @@ int main() {
 	//If Player 1...
 	if (playerNum == "0")
 	{
+		cout << endl << " Start Player 1" << endl;
 		isPlayer1 = true;
 		//Create hand for Player
 		player.randomDeal(deck.getDeck());
@@ -180,6 +181,7 @@ int main() {
 	} // end if
 	else
 	{
+		cout << endl << " Start Player 2" << endl;
 		//Clear Deck
 		deck.getDeck().clear();
 
@@ -209,13 +211,9 @@ int main() {
 		if (!isPlayer1 && isRoundOne)
 		{
 			//Wait for Player 1
-			puts("\n\nWaiting for opponent...");
+			puts("\n\n Waiting for opponent...");
 			recieveMessage();
 			deck.getTable().clear();
-			//Display Table
-			puts("\n-----------------------------------");
-			cout << endl << "Current Table" << endl;
-			puts("\n-----------------------------------");
 			line = std::string(recvbuf);
 			Card * card = player.checkCard(line.c_str());
 			if (card != NULL)
@@ -227,14 +225,11 @@ int main() {
 		}
 		else if(!isRoundOne)
 		{
-			puts("\n\nWaiting for opponent...");
+			puts("\n\n Waiting for opponent...");
 			recieveMessage();
 			//Wait for Player's turn
 			deck.getTable().clear();
-			//Display Table
-			puts("\n-----------------------------------");
-			cout << endl << "Current Table" << endl;
-			puts("\n-----------------------------------");
+			
 			line = std::string(recvbuf);
 			if (line == "BOOK")
 			{
@@ -253,17 +248,23 @@ int main() {
 				if (card != NULL)
 				{
 					deck.getTable().push_back(card);
-					cout << deck.getTable().back()->displayCard();
 				}
 			}
-
-			
 		}
 		isRoundOne = false;
 
 		bool goodCard = false;
 		while (!goodCard)
 		{
+			//Display Table
+			if (deck.getTable().size() > 0)
+			{
+				puts("\n-----------------------------------");
+				cout << endl << " Current Table" << endl;
+				puts("\n-----------------------------------");
+				cout << deck.getTable().back()->displayCard();
+			}
+			
 			puts("\n-----------------------------------");
 			puts(" Your Hand");
 			puts("-----------------------------------");
@@ -290,9 +291,35 @@ int main() {
 					if (playerCard != NULL)
 					{
 						cout << endl << playerCard->displayCard();
-						if (deck.getTable().size() > 0 && playerCard->getSuit() != deck.getTable().front()->getSuit() || playerCard->getSuit() == Suit::SPADES)
+						if (deck.getTable().size() > 0 && playerCard->getSuit() != deck.getTable().front()->getSuit())
 						{
-							cout << endl << " Card suit played does not match suit of card in table";
+							if(playerCard->getSuit() != Suit::SPADES)
+								cout << endl << " Card suit played does not match suit of card in table";
+							else
+							{
+								goodCard = true;
+								if (deck.getTable().size() > 1)
+								{
+									bool success = player.checkPlay(playerCard, deck.getTable());
+									if (success)
+									{
+										player.setBookNum(player.getBookNum() + 1);
+										sendMessage("NO_BOOK");
+										cout << endl << endl << " You won that round" << endl;
+										cout << endl << " Current books: " << player.getBookNum() << endl;
+									}
+									else
+									{
+										sendMessage("BOOK");
+										cout << endl << endl << " You lost that round" << endl;
+										cout << endl << " Current books: " << player.getBookNum() << endl;
+									}
+								}
+								else
+								{
+									sendMessage(playerCard->cardAsString().c_str());
+								}
+							}
 						}
 						else
 						{
