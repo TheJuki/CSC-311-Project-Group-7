@@ -265,7 +265,7 @@ int main() {
 				cout << deck.getTable().back()->displayCard();
 			}
 			
-			puts("\n-----------------------------------");
+			puts("\n\n-----------------------------------");
 			puts(" Your Hand");
 			puts("-----------------------------------");
 			player.displayHand();
@@ -293,8 +293,41 @@ int main() {
 						cout << endl << playerCard->displayCard();
 						if (deck.getTable().size() > 0 && playerCard->getSuit() != deck.getTable().front()->getSuit())
 						{
-							if(playerCard->getSuit() != Suit::SPADES)
+							if (playerCard->getSuit() != Suit::SPADES)
+							{
 								cout << endl << " Card suit played does not match suit of card in table";
+								bool isSuit = false;
+								for (int i = 0; i < player.getHand().size(); i++)
+								{
+									if (player.getHand()[i]->getSuit() == deck.getTable().front()->getSuit() ||
+										player.getHand()[i]->getSuit() == Suit::SPADES)
+									{
+										cout << endl << " Play a card from your hand to match the suit of the card in table";
+										isSuit = true;
+										break;
+									}
+								}
+								if (!isSuit)
+								{
+									cout << endl << " You do not have a card with the suit on the table";
+									int cardLoc = 0;
+									for (int i = 0; i < player.getHand().size(); i++)
+									{
+										if (player.getHand()[i]->getRank() == playerCard->getRank() &&
+											player.getHand()[i]->getSuit() == playerCard->getSuit())
+										{
+											cardLoc = i;
+											break;
+										}
+									}
+									goodCard = true;
+									player.getHand().erase(player.getHand().begin() + cardLoc);
+									player.getHand().shrink_to_fit();
+									sendMessage("BOOK");
+									cout << endl << endl << " You lost that round" << endl;
+									cout << endl << " Current books: " << player.getBookNum() << endl;
+								}
+							}
 							else
 							{
 								goodCard = true;
@@ -353,16 +386,21 @@ int main() {
 		} // end while
 	} // end while
 
-	if (player.getBookNum() > player.getBookNum())
+	//Send final book count
+	string temp_str = std::to_string(player.getBookNum());
+	sendMessage(temp_str.c_str());
+	//Get Book Count
+	recieveMessage();
+	if (player.getBookNum() > atoi(recvbuf))
 	{
 		puts("\n-----------------------------------");
-		cout << endl << endl << " Player 1 wins with " << player.getBookNum() << " books" << endl;
+		cout << endl << endl << " You win with " << player.getBookNum() << " books" << endl;
 		puts("-----------------------------------");
 	}
 	else
 	{
 		puts("\n-----------------------------------");
-		cout << endl << endl << " Player 2 wins with " << player.getBookNum() << " books" << endl;
+		cout << endl << endl << " Opponent wins with " << atoi(recvbuf) << " books" << endl;
 		puts("-----------------------------------");
 	}
 

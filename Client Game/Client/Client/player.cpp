@@ -41,12 +41,11 @@ Card * Player::makePlay(Card * playedCard, std::vector <Card*> &table) {
 			hand.erase(hand.begin() + cardLoc);
 			hand.shrink_to_fit();
 		}
-		else
+		else if (table.size() == 0)
 		{
 			hand.erase(hand.begin() + cardLoc);
 			hand.shrink_to_fit();
 		}
-
 
 		return playedCard;
 	}
