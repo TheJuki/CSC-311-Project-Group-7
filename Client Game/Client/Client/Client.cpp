@@ -87,9 +87,10 @@ int main() {
 
 	// Address Info
 	SOCKADDR_IN addr;
-	addr.sin_addr.s_addr = inet_addr("192.168.1.135"); //Server IP
+	addr.sin_addr.s_addr = inet_addr("10.20.123.173"); //Server IP
 	//addr.sin_addr.s_addr = inet_addr("127.0.0.1"); //localhost IP
 	addr.sin_family = AF_INET; //IPv4
+
 	addr.sin_port = htons(8888); //Port
 
 	//Connect to Spades Server
@@ -175,6 +176,7 @@ int main() {
 			deckString += deck.getDeck()[i]->cardAsString() + " ";
 		}
 		sendMessage(deckString.c_str());
+		recieveMessage();
 	} // end if
 	else
 	{
@@ -197,7 +199,6 @@ int main() {
 		player.randomDeal(deck.getDeck());
 		
 	} // end else
-
 	while (true)
 	{
 		if (player.getHand().size() == 0)
@@ -227,21 +228,36 @@ int main() {
 		else if(!isRoundOne)
 		{
 			puts("\n\nWaiting for opponent...");
-			//Wait for Player's turn
 			recieveMessage();
+			//Wait for Player's turn
 			deck.getTable().clear();
 			//Display Table
 			puts("\n-----------------------------------");
 			cout << endl << "Current Table" << endl;
 			puts("\n-----------------------------------");
 			line = std::string(recvbuf);
-			line = std::string(recvbuf);
-			Card * card = player.checkCard(line.c_str());
-			if (card != NULL)
+			if (line == "BOOK")
 			{
-				deck.getTable().push_back(card);
-				cout << deck.getTable().back()->displayCard();
+				cout << endl << " You won that round" << endl;
+				player.setBookNum(player.getBookNum() + 1);
+				cout << endl << " Current books: " << player.getBookNum() << endl;
 			}
+			else if (line == "NO_BOOK")
+			{
+				cout << endl << " You lost that round" << endl;
+				cout << endl << " Current books: " << player.getBookNum() << endl;
+			}
+			else
+			{
+				Card * card = player.checkCard(line.c_str());
+				if (card != NULL)
+				{
+					deck.getTable().push_back(card);
+					cout << deck.getTable().back()->displayCard();
+				}
+			}
+
+			
 		}
 		isRoundOne = false;
 
@@ -274,8 +290,35 @@ int main() {
 					if (playerCard != NULL)
 					{
 						cout << endl << playerCard->displayCard();
-						goodCard = true;
-						sendMessage(playerCard->cardAsString().c_str());
+						if (deck.getTable().size() > 0 && playerCard->getSuit() != deck.getTable().front()->getSuit() || playerCard->getSuit() == Suit::SPADES)
+						{
+							cout << endl << " Card suit played does not match suit of card in table";
+						}
+						else
+						{
+							goodCard = true;
+							if (deck.getTable().size() > 1)
+							{
+								bool success = player.checkPlay(playerCard, deck.getTable());
+								if (success)
+								{
+									player.setBookNum(player.getBookNum() + 1);
+									sendMessage("NO_BOOK");
+									cout << endl << endl << " You won that round" << endl;
+									cout << endl << " Current books: " << player.getBookNum() << endl;
+								}
+								else
+								{
+									sendMessage("BOOK");
+									cout << endl << endl << " You lost that round" << endl;
+									cout << endl << " Current books: " << player.getBookNum() << endl;
+								}
+							}
+							else
+							{
+								sendMessage(playerCard->cardAsString().c_str());
+							}
+						}
 					}
 				}
 

@@ -29,13 +29,13 @@ Card * Player::makePlay(Card * playedCard, std::vector <Card*> &table) {
 		return NULL;
 	}
 	else {
+		if (table.size() > 0 && playedCard->getSuit() == table.front()->getSuit() || playedCard->getSuit() == Suit::SPADES)
+		{
 
-		table.push_back(playedCard);
-
-		hand.erase(hand.begin() + cardLoc);
-		hand.shrink_to_fit();
-
-		checkPlay(playedCard, table);
+			table.push_back(playedCard);
+			hand.erase(hand.begin() + cardLoc);
+			hand.shrink_to_fit();
+		}
 
 		return playedCard;
 	}
@@ -52,19 +52,15 @@ bool Player::checkPlay(Card * playedCard, std::vector <Card*> &table) {
 			table[i]->getSuit() == playedCard->getSuit())
 			foundIt = true;
 	}
-	bool renege = ((playedCard->getSuit() != leadCard->getSuit()) && foundIt);
+	
 	//check to see if card is thrown off
-	if ((leadCard->getSuit() != playedCard->getSuit()) && (playedCard->getSuit() != Suit::SPADES))
-		return leadCard->getSuit() < playedCard->getSuit();
+	if (leadCard->getSuit() == playedCard->getSuit())
+		return leadCard->getRank() < playedCard->getRank();
 
 	//check for cutting 
 	if (playedCard->getSuit() == Suit::SPADES)
-		return playedCard->getSuit() < leadCard->getSuit();
+		return true;
 
-	//check to see if renege
-	if (renege) {
-		books = books - 2;
-	}
 	return false;
 
 }

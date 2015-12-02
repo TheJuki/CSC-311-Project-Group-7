@@ -22,6 +22,7 @@ public:
 	void displayHand();
 	Card * checkCard(const char * card);
 	std::vector <Card *>& getHand();
+	void setBookNum(int book) { books = book; }
 
 };
 
